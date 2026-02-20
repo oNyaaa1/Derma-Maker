@@ -1,19 +1,27 @@
 print("Derma Maker Loaded")
-local tbl_Frame = {}
-
-net.Receive("SandBoxedAllowed", function()
-    tbl_Frame = net.ReadTable()
-end)
-
-local function DFrameMaker(tbl,name,main_Frame)
-    if name == "DFrame" then
-        for k,v in pairs(tbl) do
-            local frame = vgui.Create("DFrame",main_Frame)
-            frame:SetSize(v.SizeW,v.SizeH)
-            frame:SetPos(0,0)
-            frame:SetTitle("DermaMaker")
-            frame:MakePopup()
-        end
+local curate = 0
+local frames = nil
+local selected = {}
+local function DFrameMaker(name,main_Frame)
+    if curate >= CurTime() then return end
+    curate = CurTime() + 1
+    
+    if name == "DFrame"  then
+        if IsValid(frames) then frames:Remove() end
+        frames = vgui.Create("DFrame",main_Frame)
+        frames:SetSize(600,400)
+        frames:SetPos(0,0)
+        frames:SetTitle("DermaMaker")
+        selected[#selected + 1] = frames
+    end
+    if name == "DButton" and IsValid(frames) then
+        local button = vgui.Create("DButton",frames)
+        button:Dock(TOP)
+        button:SetHeight(25)
+        button:SetText(name)
+        button.DoClick = function(s)
+        end			
+        selected[#selected + 1] = button
     end
 end
 
@@ -33,14 +41,14 @@ concommand.Add("derma_creat0r", function(pl)
     frame1.Paint = function(s,w,h)
         draw.RoundedBox(0,0,0,w,h,Color(64,64,64,100))
     end
-    for k,v in pairs(tbl_Frame) do
-        print(v.Main)
+    
+    for k,v in pairs({"DFrame","DButton"}) do
         local button = vgui.Create("DButton",frame1)
         button:Dock(TOP)
         button:SetHeight(25)
-        button:SetText(v.Main)
-        button.DoClick = function()
-            DFrameMaker(tbl_Frame,v.Main,frame)
+        button:SetText(v)
+        button.DoClick = function(s)
+            DFrameMaker(v,frame)
         end
     end
 
