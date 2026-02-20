@@ -12,6 +12,7 @@ SANDBOXED["Allowed"] = {
 }
 
 hook.Add("PlayerInitialSpawn", "SellYourSoul", function(pl)
+    if not pl:IsAdmin() then return end
     net.Start("SandBoxedAllowed")
     net.WriteTable(SANDBOXED["Allowed"])
     net.Send(pl)
