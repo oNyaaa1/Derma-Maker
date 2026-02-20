@@ -1,15 +1,9 @@
 print("Derma Maker Loaded")
-local SANDBOXED = SANDBOXED or {}
-SANDBOXED["Allowed"] = {
-    {
-        Main = "DFrame",
-        Title = "Test",
-        SizeW = 400,
-        SizeH = 400,
-        Center = true,
-    }
-}
+local tbl_Frame = {}
 
+net.Receive("SandBoxedAllowed", function()
+    tbl_Frame = net.ReadTable()
+end)
 
 local function DFrameMaker(tbl,name,main_Frame)
     if name == "DFrame" then
@@ -39,14 +33,14 @@ concommand.Add("derma_creat0r", function(pl)
     frame1.Paint = function(s,w,h)
         draw.RoundedBox(0,0,0,w,h,Color(64,64,64,100))
     end
-    for k,v in pairs(SANDBOXED["Allowed"]) do
+    for k,v in pairs(tbl_Frame) do
         print(v.Main)
         local button = vgui.Create("DButton",frame1)
         button:Dock(TOP)
         button:SetHeight(25)
         button:SetText(v.Main)
         button.DoClick = function()
-            DFrameMaker(SANDBOXED["Allowed"],v.Main,frame)
+            DFrameMaker(tbl_Frame,v.Main,frame)
         end
     end
 
