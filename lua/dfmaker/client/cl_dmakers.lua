@@ -2,17 +2,33 @@ print("Derma Maker Loaded")
 local curate = 0
 local frames = nil
 local selected = {}
+local selected2 = {}
 
-
-function SelectMenu(name,test)
-    print(name,test)
+function NumSlider(frame,text,f2,min,max,func)
+    local Scratch = vgui.Create( "DNumberScratch", f2 )
+    Scratch:Dock(LEFT)
+    Scratch:SetText( text )
+    Scratch:SetValue( 5 )
+    Scratch:SetMin( min )
+    Scratch:SetMax( max )
+    Scratch.OnValueChanged = function( self, value )
+        print(value)
+        func(value)
+    end
+    return Scratch
 end
 
-local function DFrameMaker(name,main_Frame,f3)
+function SelectMenu(name,frame,f2)
+    if name == "DFrame" then
+        selected2[#selected2 + 1] = NumSlider(frame,"Width",f2,0,800,function(value) frame:SetWidth(value) end)
+    end
+end
+
+local function DFrameMaker(name,main_Frame,f3,f2)
         if curate >= CurTime() then return end
         curate = CurTime() + 1
         
-        if name == "DFrame"  then
+    if name == "DFrame" then
         if IsValid(frames) then 
             frames:Remove() 
             for k,v in pairs(selected) do v:Remove() end
@@ -27,7 +43,8 @@ local function DFrameMaker(name,main_Frame,f3)
         buttonz:SetHeight(25)
         buttonz:SetText("DFrame")
         buttonz.DoClick = function(s)
-            SelectMenu("DFrame",frames)
+            for k,v in pairs(selected2) do if IsValid(v) then v:Remove() end end
+            SelectMenu("DFrame",frames,f2)
         end
         selected[#selected + 1] = buttonz
     end
@@ -45,7 +62,7 @@ local function DFrameMaker(name,main_Frame,f3)
         buttonz:SetHeight(25)
         buttonz:SetText("DButton")
         buttonz.DoClick = function(s)
-            SelectMenu("DButton",button)
+            SelectMenu("DButton",button,f2)
         end
         selected[#selected + 1] = buttonz
     end
@@ -63,11 +80,13 @@ concommand.Add("derma_creat0r", function(pl)
     end
     
     local frame1 = vgui.Create("DPanel",frame)
+    frame1:Dock(FILL)
     frame1:SetSize(ScrW() / 2 - 500,ScrH() - 30)
-    frame1:SetPos(0,25)
+    frame1:DockMargin(0,0,1000,0)
     frame1.Paint = function(s,w,h)
         draw.RoundedBox(0,0,0,w,h,Color(64,64,64,100))
     end
+    frame1:InvalidateLayout(true)
     
     local frame2 = vgui.Create("DPanel",frame)
     frame2:Dock(RIGHT)
@@ -76,7 +95,7 @@ concommand.Add("derma_creat0r", function(pl)
     frame2.Paint = function(s,w,h)
         draw.RoundedBox(0,0,0,w,h,Color(0,0,0,188))
     end
-
+    
     local frame3 = vgui.Create("DPanel",frame2)
     frame3:Dock(RIGHT)
     frame3:SetSize(ScrW() / 2 - 500,295)
@@ -91,8 +110,7 @@ concommand.Add("derma_creat0r", function(pl)
         button:SetHeight(25)
         button:SetText(v)
         button.DoClick = function(s)
-            DFrameMaker(v,frame,frame3)
-            
+            DFrameMaker(v,frame,frame3,frame2)
         end
     end
 
