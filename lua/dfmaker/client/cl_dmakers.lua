@@ -5,14 +5,13 @@ local selected = {}
 local selected2 = {}
 
 function NumSlider(frame,text,f2,min,max,func)
-    local Scratch = vgui.Create( "DNumberScratch", f2 )
-    Scratch:Dock(LEFT)
+    local Scratch = vgui.Create( "DNumSlider", f2 )
+    Scratch:Dock(TOP)
     Scratch:SetText( text )
     Scratch:SetValue( 5 )
     Scratch:SetMin( min )
     Scratch:SetMax( max )
     Scratch.OnValueChanged = function( self, value )
-        print(value)
         func(value)
     end
     return Scratch
@@ -20,7 +19,8 @@ end
 
 function SelectMenu(name,frame,f2)
     if name == "DFrame" then
-        selected2[#selected2 + 1] = NumSlider(frame,"Width",f2,0,800,function(value) frame:SetWidth(value) end)
+        selected2[#selected2 + 1] = NumSlider(frame,"Width",f2,100,ScrW(),function(value) frame:SetWidth(value) end)
+        selected2[#selected2 + 1] = NumSlider(frame,"Height",f2,100,ScrH(),function(value) frame:SetHeight(value) end)
     end
 end
 
@@ -97,12 +97,20 @@ concommand.Add("derma_creat0r", function(pl)
     end
     
     local frame3 = vgui.Create("DPanel",frame2)
-    frame3:Dock(RIGHT)
+    frame3:Dock(FILL)
     frame3:SetSize(ScrW() / 2 - 500,295)
     frame3:DockMargin(0,0,0,600)
     frame3.Paint = function(s,w,h)
-        draw.RoundedBox(0,0,0,w,h,Color(60,60,60,100))
+        draw.RoundedBox(0,0,0,w,h,Color(64,64,64,100))
     end
+
+    local frame4 = vgui.Create("DPanel",frame2)
+    frame4:Dock(FILL)
+    frame4:DockMargin(0,270,0,0)
+    frame4.Paint = function(s,w,h)
+        draw.RoundedBox(0,0,0,w,h,Color(64,64,64,100))
+    end
+
 
     for k,v in pairs({"DFrame","DButton"}) do
         local button = vgui.Create("DButton",frame1)
@@ -110,7 +118,7 @@ concommand.Add("derma_creat0r", function(pl)
         button:SetHeight(25)
         button:SetText(v)
         button.DoClick = function(s)
-            DFrameMaker(v,frame,frame3,frame2)
+            DFrameMaker(v,frame,frame3,frame4)
         end
     end
 
