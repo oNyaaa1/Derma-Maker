@@ -77,6 +77,7 @@ local function DFrameMaker(name,main_Frame,f3,f2)
         buttonz:SetHeight(25)
         buttonz:SetText("DPanel")
         buttonz.DoClick = function(s)
+            for k,v in pairs(selected2) do if IsValid(v) then v:Remove() end end
             SelectMenu("DPanel",dpanel,f2)
         end
 
@@ -96,6 +97,7 @@ local function DFrameMaker(name,main_Frame,f3,f2)
         buttonz:SetHeight(25)
         buttonz:SetText("DButton")
         buttonz.DoClick = function(s)
+            for k,v in pairs(selected2) do if IsValid(v) then v:Remove() end end
             SelectMenu("DButton",button,f2)
         end
 
