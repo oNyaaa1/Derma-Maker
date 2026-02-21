@@ -3,6 +3,7 @@ local curate = 0
 local frames = nil
 local selected = {}
 local selected2 = {}
+local CurrSelected = nil
 
 function NumSlider(frame,text,f2,min,max,func)
     local val = nil
@@ -62,6 +63,7 @@ local function DFrameMaker(name,main_Frame,f3,f2)
         buttonz.DoClick = function(s)
             for k,v in pairs(selected2) do if IsValid(v) then v:Remove() end end
             SelectMenu("DFrame",frames,f2)
+            CurrSelected = frames
         end
 
         selected[#selected + 1] = buttonz
@@ -69,9 +71,8 @@ local function DFrameMaker(name,main_Frame,f3,f2)
     
     if name == "DPanel" and IsValid(frames) then
         local dpanel = vgui.Create("DPanel",frames)
-        dpanel:Dock(FILL)
+        dpanel:Dock(LEFT)
         
-
         local buttonz = vgui.Create("DButton",f3)
         buttonz:Dock(TOP)
         buttonz:SetHeight(25)
@@ -79,13 +80,15 @@ local function DFrameMaker(name,main_Frame,f3,f2)
         buttonz.DoClick = function(s)
             for k,v in pairs(selected2) do if IsValid(v) then v:Remove() end end
             SelectMenu("DPanel",dpanel,f2)
+            CurrSelected = dpanel
         end
 
         selected[#selected + 1] = buttonz
     end
  
     if name == "DButton" and IsValid(frames) then
-        local button = vgui.Create("DButton",frames)
+        print(CurrSelected or frames)
+        local button = vgui.Create("DButton",CurrSelected or frames)
         button:Dock(TOP)
         button:SetHeight(25)
         button:SetText(name)
