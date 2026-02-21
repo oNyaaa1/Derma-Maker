@@ -20,6 +20,15 @@ function NumSlider(frame,text,f2,min,max,func)
     return Scratch
 end
 
+function ButtonSider(frame,text,f2,func)
+    local DTextE = vgui.Create( "DTextEntry", f2 ) -- create the form as a child of frame
+	DTextE:Dock( TOP )
+	DTextE.OnEnter = function( self )
+		frame:SetText(self:GetValue())
+	end
+    return DTextE
+end
+
 local curr_SizeW = 800
 local curr_SizeH = 600
 
@@ -34,6 +43,10 @@ function SelectMenu(name,frame,f2)
         selected2[#selected2 + 1] = NumSlider(frame,"DockMarginRight",f2,100,ScrW(),function(value) frame:DockMargin(0,0,value,0) frame:SetWidth(curr_SizeW)  frame:SetHeight(curr_SizeH) end)
         selected2[#selected2 + 1] = NumSlider(frame,"DockMarginUp",f2,100,ScrW(),function(value) frame:DockMargin(0,value,0,0) frame:SetWidth(curr_SizeW)  frame:SetHeight(curr_SizeH) end)
         selected2[#selected2 + 1] = NumSlider(frame,"DockMarginDown",f2,100,ScrW(),function(value) frame:DockMargin(0,0,0,value) frame:SetWidth(curr_SizeW)  frame:SetHeight(curr_SizeH) end)
+    end
+
+    if name == "DButton" then
+        selected2[#selected2 + 1] = ButtonSider(frame,"DockMarginLeft",f2,100,function(value)  end)
     end
 end
 
@@ -65,7 +78,10 @@ local function DFrameMaker(name,main_Frame,f3,f2)
             SelectMenu("DFrame",frames,f2)
             CurrSelected = frames
         end
-
+        buttonz.DoRightClick = function(s)
+            s:Remove()
+            frames:Remove()
+        end
         selected[#selected + 1] = buttonz
     end
     
@@ -82,12 +98,14 @@ local function DFrameMaker(name,main_Frame,f3,f2)
             SelectMenu("DPanel",dpanel,f2)
             CurrSelected = dpanel
         end
-
+        buttonz.DoRightClick = function(s)
+            s:Remove()
+            dpanel:Remove()
+        end
         selected[#selected + 1] = buttonz
     end
  
     if name == "DButton" and IsValid(frames) then
-        print(CurrSelected or frames)
         local button = vgui.Create("DButton",CurrSelected or frames)
         button:Dock(TOP)
         button:SetHeight(25)
@@ -103,7 +121,10 @@ local function DFrameMaker(name,main_Frame,f3,f2)
             for k,v in pairs(selected2) do if IsValid(v) then v:Remove() end end
             SelectMenu("DButton",button,f2)
         end
-
+        buttonz.DoRightClick = function(s)
+            s:Remove()
+            button:Remove()
+        end
         selected[#selected + 1] = buttonz
     end
 end
