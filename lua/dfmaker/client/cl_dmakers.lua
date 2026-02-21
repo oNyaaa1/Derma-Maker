@@ -5,38 +5,55 @@ local selected = {}
 local selected2 = {}
 
 function NumSlider(frame,text,f2,min,max,func)
+    local val = nil
     local Scratch = vgui.Create( "DNumSlider", f2 )
     Scratch:Dock(TOP)
     Scratch:SetText( text )
-    Scratch:SetValue( 5 )
+    Scratch:SetValue( 200 )
     Scratch:SetMin( min )
     Scratch:SetMax( max )
     Scratch.OnValueChanged = function( self, value )
         func(value)
+        val = value
     end
     return Scratch
 end
 
+local curr_SizeW = 800
+local curr_SizeH = 600
+
 function SelectMenu(name,frame,f2)
     if name == "DFrame" then
-        selected2[#selected2 + 1] = NumSlider(frame,"Width",f2,100,ScrW(),function(value) frame:SetWidth(value) end)
-        selected2[#selected2 + 1] = NumSlider(frame,"Height",f2,100,ScrH(),function(value) frame:SetHeight(value) end)
+        selected2[#selected2 + 1] = NumSlider(frame,"Width",f2,100,ScrW(),function(value) frame:SetWidth(value) curr_SizeW = value end)
+        selected2[#selected2 + 1] = NumSlider(frame,"Height",f2,100,ScrH(),function(value) frame:SetHeight(value) curr_SizeH = value end)
+    end
+    
+    if name == "DPanel" then
+        selected2[#selected2 + 1] = NumSlider(frame,"DockMarginLeft",f2,100,ScrW(),function(value) frame:DockMargin(value,0,0,0) frame:SetWidth(curr_SizeW)  frame:SetHeight(curr_SizeH) end)
+        selected2[#selected2 + 1] = NumSlider(frame,"DockMarginRight",f2,100,ScrW(),function(value) frame:DockMargin(0,0,value,0) frame:SetWidth(curr_SizeW)  frame:SetHeight(curr_SizeH) end)
+        selected2[#selected2 + 1] = NumSlider(frame,"DockMarginUp",f2,100,ScrW(),function(value) frame:DockMargin(0,value,0,0) frame:SetWidth(curr_SizeW)  frame:SetHeight(curr_SizeH) end)
+        selected2[#selected2 + 1] = NumSlider(frame,"DockMarginDown",f2,100,ScrW(),function(value) frame:DockMargin(0,0,0,value) frame:SetWidth(curr_SizeW)  frame:SetHeight(curr_SizeH) end)
     end
 end
 
 local function DFrameMaker(name,main_Frame,f3,f2)
         if curate >= CurTime() then return end
-        curate = CurTime() + 1
+        curate = CurTime() + 0.2
         
     if name == "DFrame" then
         if IsValid(frames) then 
             frames:Remove() 
             for k,v in pairs(selected) do v:Remove() end
         end
+
         frames = vgui.Create("DFrame",main_Frame)
         frames:SetSize(600,400)
         frames:SetPos(0,0)
         frames:SetTitle("DermaMaker")
+        frames:Center()
+        frames.OnClose = function()
+            for k,v in pairs(selected) do v:Remove() end
+        end
         
         local buttonz = vgui.Create("DButton",f3)
         buttonz:Dock(TOP)
@@ -46,9 +63,26 @@ local function DFrameMaker(name,main_Frame,f3,f2)
             for k,v in pairs(selected2) do if IsValid(v) then v:Remove() end end
             SelectMenu("DFrame",frames,f2)
         end
+
         selected[#selected + 1] = buttonz
     end
     
+    if name == "DPanel" and IsValid(frames) then
+        local dpanel = vgui.Create("DPanel",frames)
+        dpanel:Dock(FILL)
+        
+
+        local buttonz = vgui.Create("DButton",f3)
+        buttonz:Dock(TOP)
+        buttonz:SetHeight(25)
+        buttonz:SetText("DPanel")
+        buttonz.DoClick = function(s)
+            SelectMenu("DPanel",dpanel,f2)
+        end
+
+        selected[#selected + 1] = buttonz
+    end
+ 
     if name == "DButton" and IsValid(frames) then
         local button = vgui.Create("DButton",frames)
         button:Dock(TOP)
@@ -64,6 +98,7 @@ local function DFrameMaker(name,main_Frame,f3,f2)
         buttonz.DoClick = function(s)
             SelectMenu("DButton",button,f2)
         end
+
         selected[#selected + 1] = buttonz
     end
 end
@@ -112,7 +147,7 @@ concommand.Add("derma_creat0r", function(pl)
     end
 
 
-    for k,v in pairs({"DFrame","DButton"}) do
+    for k,v in pairs({"DFrame","DPanel","DButton"}) do
         local button = vgui.Create("DButton",frame1)
         button:Dock(TOP)
         button:SetHeight(25)
