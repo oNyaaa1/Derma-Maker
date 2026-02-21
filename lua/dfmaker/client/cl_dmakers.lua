@@ -2,18 +2,36 @@ print("Derma Maker Loaded")
 local curate = 0
 local frames = nil
 local selected = {}
-local function DFrameMaker(name,main_Frame)
-    if curate >= CurTime() then return end
-    curate = CurTime() + 1
-    
-    if name == "DFrame"  then
-        if IsValid(frames) then frames:Remove() end
+
+
+function SelectMenu(name,test)
+    print(name,test)
+end
+
+local function DFrameMaker(name,main_Frame,f3)
+        if curate >= CurTime() then return end
+        curate = CurTime() + 1
+        
+        if name == "DFrame"  then
+        if IsValid(frames) then 
+            frames:Remove() 
+            for k,v in pairs(selected) do v:Remove() end
+        end
         frames = vgui.Create("DFrame",main_Frame)
         frames:SetSize(600,400)
         frames:SetPos(0,0)
         frames:SetTitle("DermaMaker")
-        selected[#selected + 1] = frames
+        
+        local buttonz = vgui.Create("DButton",f3)
+        buttonz:Dock(TOP)
+        buttonz:SetHeight(25)
+        buttonz:SetText("DFrame")
+        buttonz.DoClick = function(s)
+            SelectMenu("DFrame",frames)
+        end
+        selected[#selected + 1] = buttonz
     end
+    
     if name == "DButton" and IsValid(frames) then
         local button = vgui.Create("DButton",frames)
         button:Dock(TOP)
@@ -21,9 +39,18 @@ local function DFrameMaker(name,main_Frame)
         button:SetText(name)
         button.DoClick = function(s)
         end			
-        selected[#selected + 1] = button
+        
+        local buttonz = vgui.Create("DButton",f3)
+        buttonz:Dock(TOP)
+        buttonz:SetHeight(25)
+        buttonz:SetText("DButton")
+        buttonz.DoClick = function(s)
+            SelectMenu("DButton",button)
+        end
+        selected[#selected + 1] = buttonz
     end
 end
+
 
 concommand.Add("derma_creat0r", function(pl)
     local frame = vgui.Create("DFrame")
@@ -42,16 +69,6 @@ concommand.Add("derma_creat0r", function(pl)
         draw.RoundedBox(0,0,0,w,h,Color(64,64,64,100))
     end
     
-    for k,v in pairs({"DFrame","DButton"}) do
-        local button = vgui.Create("DButton",frame1)
-        button:Dock(TOP)
-        button:SetHeight(25)
-        button:SetText(v)
-        button.DoClick = function(s)
-            DFrameMaker(v,frame)
-        end
-    end
-
     local frame2 = vgui.Create("DPanel",frame)
     frame2:Dock(RIGHT)
     frame2:SetSize(ScrW() / 2 - 500,ScrH())
@@ -67,4 +84,18 @@ concommand.Add("derma_creat0r", function(pl)
     frame3.Paint = function(s,w,h)
         draw.RoundedBox(0,0,0,w,h,Color(60,60,60,100))
     end
+
+    for k,v in pairs({"DFrame","DButton"}) do
+        local button = vgui.Create("DButton",frame1)
+        button:Dock(TOP)
+        button:SetHeight(25)
+        button:SetText(v)
+        button.DoClick = function(s)
+            DFrameMaker(v,frame,frame3)
+            
+        end
+    end
+
+   
+    
 end)
